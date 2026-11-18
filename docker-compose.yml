@@ -1,0 +1,88 @@
+
+name: news-ai-monitor
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-news_monitor}
+      POSTGRES_USER: ${POSTGRES_USER:-news_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_local}
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [app-net]
+
+  backend:
+    build: { context: ./backend, target: development }
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-news_monitor}
+      POSTGRES_USER: ${POSTGRES_USER:-news_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_local}
+      INTERNAL_WEBHOOK_SECRET: ${INTERNAL_WEBHOOK_SECRET:?Define INTERNAL_WEBHOOK_SECRET en el .env de la raíz}
+      CORS_ORIGIN: http://localhost:3000
+    ports: ["127.0.0.1:4000:4000"]
+    volumes:
+      - ./backend/src:/app/src
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/api/health').then(r => { if (!r.ok) process.exitCode = 1 }).catch(() => { process.exitCode = 1 })"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    depends_on:
+      postgres: { condition: service_healthy }
+    networks: [app-net]
+
+  worker:
+    build: { context: ./worker, target: development }
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-news_monitor}
+      POSTGRES_USER: ${POSTGRES_USER:-news_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_local}
+      BACKEND_INTERNAL_URL: http://backend:4000/api/internal/notify
+      INTERNAL_WEBHOOK_SECRET: ${INTERNAL_WEBHOOK_SECRET:?Define INTERNAL_WEBHOOK_SECRET en el .env de la raíz}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GOOGLE_MODEL: ${GOOGLE_MODEL:-gemini-3.5-flash-lite}
+      POLL_INTERVAL_SECONDS: ${POLL_INTERVAL_SECONDS:-300}
+      WATCHFILES_FORCE_POLLING: "true"
+    volumes: ["./worker/app:/app/app"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      backend: { condition: service_healthy }
+    networks: [app-net]
+
+  frontend:
+    build: { context: ./frontend, target: development }
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+    ports: ["127.0.0.1:3000:3000"]
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+      - frontend_next:/app/.next
+    depends_on:
+      backend: { condition: service_healthy }
+    networks: [app-net]
+
+volumes:
+  pgdata:
+  frontend_node_modules:
+  frontend_next:
+networks:
+  app-net:
+    driver: bridge

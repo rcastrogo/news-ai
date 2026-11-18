@@ -1,0 +1,321 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   1) PALETA GLOBAL  ←  ÚNICA SECCIÓN QUE HAY QUE EDITAR PARA CAMBIAR EL ASPECTO
+   --------------------------------------------------------------------------
+   Todo el resto del archivo se calcula a partir de estas variables.
+
+   --hue-primary / --hue-accent / --hue-neutral : tono (0-360)
+        0-30 rojos · 50-90 ámbar/amarillo · 110-170 verdes · 180-210 teal/cian
+        220-250 azules · 260-290 índigo/violeta · 300-350 magenta/rosa
+   --chroma-primary / --chroma-accent : saturación (0 = gris · 0.1 apagado
+        · 0.15 medio · 0.2+ vivo)
+   --chroma-neutral : cuánto "tinte" llevan fondos, bordes y grises (0-0.04)
+   --lightness-primary / -dark : claridad del color primario en modo claro / oscuro
+   ========================================================================== */
+:root {
+  /* Tema por defecto: índigo / violeta (el que ya tenías) */
+  --hue-primary: 275;
+  --hue-accent: 330;
+  --hue-neutral: 260;
+
+  --chroma-primary: 0.2;
+  --chroma-accent: 0.17;
+  --chroma-neutral: 0.03;
+
+  --lightness-primary: 0.53;
+  --lightness-primary-dark: 0.8;
+}
+
+/* ----- Presets: se activan con <html data-theme="..."> ------------------- */
+
+/* Rojos apagados / terrosos (tu otro proyecto) */
+:root[data-theme="red"] {
+  --hue-primary: 25;
+  --hue-accent: 355;
+  --hue-neutral: 15;
+
+  --chroma-primary: 0.14;
+  --chroma-accent: 0.12;
+  --chroma-neutral: 0.015;
+
+  --lightness-primary: 0.55;
+  --lightness-primary-dark: 0.68;
+}
+
+/* Azules claros */
+:root[data-theme="blue"] {
+  --hue-primary: 235;
+  --hue-accent: 205;
+  --hue-neutral: 240;
+
+  --chroma-primary: 0.15;
+  --chroma-accent: 0.12;
+  --chroma-neutral: 0.025;
+
+  --lightness-primary: 0.58;
+  --lightness-primary-dark: 0.78;
+}
+
+/* Verdes */
+:root[data-theme="green"] {
+  --hue-primary: 150;
+  --hue-accent: 190;
+  --hue-neutral: 155;
+
+  --chroma-primary: 0.14;
+  --chroma-accent: 0.11;
+  --chroma-neutral: 0.02;
+
+  --lightness-primary: 0.56;
+  --lightness-primary-dark: 0.76;
+}
+
+/* Tema Grises (Neutros y elegantes) */
+:root[data-theme="gray"] {
+  --hue-primary: 240;
+  --hue-accent: 260;
+  --hue-neutral: 240;
+
+  --chroma-primary: 0.01;
+  --chroma-accent: 0.02;
+  --chroma-neutral: 0.01;
+
+  --lightness-primary: 0.50;
+  --lightness-primary-dark: 0.75;
+}
+
+/* Tema Amarillos "Oscuros" (Ámbar / Dorados profundos) */
+:root[data-theme="yellow"] {
+  --hue-primary: 75;
+  --hue-accent: 45;
+  --hue-neutral: 80;
+
+  --chroma-primary: 0.16;
+  --chroma-accent: 0.18;
+  --chroma-neutral: 0.025;
+
+  --lightness-primary: 0.65;
+  --lightness-primary-dark: 0.80;
+}
+
+/* Tema Summer (Cálido y vibrante: anaranjados y corales veraniegos) */
+:root[data-theme="summer"] {
+  --hue-primary: 35;
+  --hue-accent: 15;
+  --hue-neutral: 40;
+
+  --chroma-primary: 0.20;
+  --chroma-accent: 0.22;
+  --chroma-neutral: 0.03;
+
+  --lightness-primary: 0.60;
+  --lightness-primary-dark: 0.78;
+}
+
+/* Tema Winter (Friso invernal: cian, azules profundos y gélidos) */
+:root[data-theme="winter"] {
+  --hue-primary: 215;
+  --hue-accent: 195;
+  --hue-neutral: 220;
+
+  --chroma-primary: 0.15;
+  --chroma-accent: 0.12;
+  --chroma-neutral: 0.02;
+
+  --lightness-primary: 0.55;
+  --lightness-primary-dark: 0.74;
+}
+
+/* ==========================================================================
+   2) TOKENS DERIVADOS  ←  no hace falta tocar nada de aquí hacia abajo
+   ========================================================================== */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-dark: var(--brand-accent-dark);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  /* Intensidad de los brillos de fondo (0 = apagados, 1 = originales) */
+  --glow-strength: 0.5;
+
+  --background: oklch(0.98 calc(var(--chroma-neutral) / 6) var(--hue-neutral));
+  --foreground: oklch(0.2 var(--chroma-neutral) var(--hue-neutral));
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 var(--chroma-neutral) var(--hue-neutral));
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 var(--chroma-neutral) var(--hue-neutral));
+
+  --primary: oklch(var(--lightness-primary) var(--chroma-primary) var(--hue-primary));
+  --primary-dark: oklch(calc(var(--lightness-primary) - 0.12) var(--chroma-primary) var(--hue-primary));
+  --primary-foreground: oklch(0.99 0 0);
+
+  --brand-accent: oklch(calc(var(--lightness-primary) - 0.03) var(--chroma-accent) var(--hue-accent));
+  --brand-accent-dark: oklch(calc(var(--lightness-primary) - 0.15) var(--chroma-accent) var(--hue-accent));
+
+  --secondary: oklch(0.96 calc(var(--chroma-neutral) / 3) var(--hue-neutral));
+  --secondary-foreground: oklch(0.25 calc(var(--chroma-neutral) * 1.3) var(--hue-neutral));
+  --muted: oklch(0.96 calc(var(--chroma-neutral) / 3) var(--hue-neutral));
+  --muted-foreground: oklch(0.55 calc(var(--chroma-neutral) * 1.3) var(--hue-neutral));
+  --accent: oklch(0.96 calc(var(--chroma-neutral) / 3) var(--hue-neutral));
+  --accent-foreground: oklch(0.25 calc(var(--chroma-neutral) * 1.3) var(--hue-neutral));
+  --destructive: oklch(0.58 0.24 27);
+  --border: oklch(0.92 calc(var(--chroma-neutral) / 3) var(--hue-neutral));
+  --input: oklch(0.92 calc(var(--chroma-neutral) / 3) var(--hue-neutral));
+  --ring: oklch(0.7 calc(var(--chroma-neutral) * 1.3) var(--hue-neutral));
+
+  /* Brillos de fondo (usados por .bg) */
+  --glow-1: oklch(0.65 var(--chroma-primary) var(--hue-primary) / calc(0.35 * var(--glow-strength)));
+  --glow-2: oklch(0.55 var(--chroma-primary) calc(var(--hue-primary) - 8) / calc(0.35 * var(--glow-strength)));
+  --glow-3: oklch(0.55 var(--chroma-accent) var(--hue-accent) / calc(0.2 * var(--glow-strength)));
+  --glow-4: oklch(0.72 var(--chroma-primary) calc(var(--hue-primary) + 10) / calc(0.15 * var(--glow-strength)));
+  --glow-orb-1: oklch(0.65 var(--chroma-primary) var(--hue-primary) / calc(0.18 * var(--glow-strength)));
+  --glow-orb-2: oklch(0.55 var(--chroma-accent) var(--hue-accent) / calc(0.15 * var(--glow-strength)));
+}
+
+.dark {
+  --glow-strength: 1;
+
+  --background: oklch(0.16 var(--chroma-neutral) var(--hue-neutral));
+  --foreground: oklch(0.98 calc(var(--chroma-neutral) / 6) var(--hue-neutral));
+  --card: oklch(0.21 var(--chroma-neutral) var(--hue-neutral));
+  --card-foreground: oklch(0.98 calc(var(--chroma-neutral) / 6) var(--hue-neutral));
+  --popover: oklch(0.21 var(--chroma-neutral) var(--hue-neutral));
+  --popover-foreground: oklch(0.98 calc(var(--chroma-neutral) / 6) var(--hue-neutral));
+
+  --primary: oklch(var(--lightness-primary-dark) calc(var(--chroma-primary) * 0.6) var(--hue-primary));
+  --primary-dark: oklch(calc(var(--lightness-primary-dark) - 0.12) calc(var(--chroma-primary) * 0.6) var(--hue-primary));
+  --primary-foreground: oklch(0.2 0.04 var(--hue-primary));
+
+  --brand-accent: oklch(calc(var(--lightness-primary-dark) - 0.1) calc(var(--chroma-accent) * 0.8) var(--hue-accent));
+  --brand-accent-dark: oklch(calc(var(--lightness-primary-dark) - 0.22) calc(var(--chroma-accent) * 0.8) var(--hue-accent));
+
+  --secondary: oklch(0.28 var(--chroma-neutral) var(--hue-neutral));
+  --secondary-foreground: oklch(0.98 calc(var(--chroma-neutral) / 6) var(--hue-neutral));
+  --muted: oklch(0.28 var(--chroma-neutral) var(--hue-neutral));
+  --muted-foreground: oklch(0.72 calc(var(--chroma-neutral) * 1.3) var(--hue-neutral));
+  --accent: oklch(0.28 var(--chroma-neutral) var(--hue-neutral));
+  --accent-foreground: oklch(0.98 calc(var(--chroma-neutral) / 6) var(--hue-neutral));
+  --destructive: oklch(0.7 0.19 22);
+  /* Bordes con un ligero tinte del color primario, como en tu otro proyecto */
+  --border: oklch(0.7 var(--chroma-primary) var(--hue-primary) / 14%);
+  --input: oklch(0.7 var(--chroma-primary) var(--hue-primary) / 18%);
+  --ring: oklch(0.55 calc(var(--chroma-neutral) * 1.3) var(--hue-neutral));
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html,
+  body {
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+/* ==========================================================================
+   3) FONDO CON BRILLOS (usa --glow-* y --glow-orb-* de arriba)
+   ========================================================================== */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  background:
+    radial-gradient(1200px 760px at 12% 6%, var(--glow-1), transparent 65%),
+    radial-gradient(1100px 720px at 20% 6%, var(--glow-2), transparent 66%),
+    radial-gradient(900px 650px at 65% 55%, var(--glow-3), transparent 70%),
+    radial-gradient(1000px 700px at 55% 92%, var(--glow-4), transparent 72%);
+}
+
+.bg::before {
+  content: '';
+  position: absolute;
+  width: 680px;
+  height: 680px;
+  left: -180px;
+  top: 40px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--glow-orb-1),
+    transparent 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.bg::after {
+  content: '';
+  position: absolute;
+  width: 620px;
+  height: 620px;
+  right: -220px;
+  bottom: 10px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--glow-orb-2),
+    transparent 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.bgGrain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+
+
+.bg-card,
+.bg-popover,
+.bg-secondary,
+.bg-muted,
+.bg-accent,
+.bg-input {
+  opacity: 0.8;
+}
+
